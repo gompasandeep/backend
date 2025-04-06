@@ -24,20 +24,17 @@ pipeline {
             } 
         }
 
-        stage('Test') {
+        stage('Install Dependencies') {
             steps {
-                sh 'echo This is test'
-                sh 'env'
+                sh 'npm install'
             }
         }
 
-        stage('Deploy') {
-            when{
-                expression { env.GIT_BRANCH == "origin/main" }
-            }
+        stage('Docker Build') {
             steps {
-                sh 'echo "This is Deploy"'
-               // error "pipeline failed"
+                sh """
+                docker build -t sandeepgompa/backend:${appVersion}
+                """
             }
         }
     }
