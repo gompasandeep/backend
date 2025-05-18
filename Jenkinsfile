@@ -9,8 +9,11 @@ pipeline {
         //retry(1)
     }
     environment {
+        PROJECT = 'expense'
+        COMPONENT = 'backend'
         DEBUG = 'true'
         appVersion = '' // this will become global we can use across pipeline
+        ACC_ID =  339713057882
     }
     stages {
         stage('Read the version') {
@@ -30,11 +33,27 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        // stage('Docker Build') {
+        //     steps {
+        //         sh """
+        //         docker build -t sandeepgompa/backend:${appVersion} .
+        //         """
+        //     }
+        // }
+        stage('Docker Build'){
             steps {
-                sh """
-                docker build -t sandeepgompa/backend:${appVersion} .
-                """
+               script{
+                withAWS(region: 'us-east-1', credentials: 'aws-creds') {
+                    sh """
+                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com
+
+                    docker build -t  .
+
+                    docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${project}/${component}:${appVersion}
+                    """
+                }
+                 
+               }
             }
         }
     }
