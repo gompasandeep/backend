@@ -1,19 +1,19 @@
 pipeline {
-    agent {
-        label 'AGENT-1'
-    }
-
-    options {
-        timeout(time: 10, unit: 'MINUTES')
-        disableConcurrentBuilds()
-        //retry(1)
-    }
+    agent {label 'AGENT-1'}
     environment {
         PROJECT = 'expense'
         COMPONENT = 'backend'
         DEBUG = 'true'
         appVersion = '' // this will become global we can use across pipeline
         ACC_ID =  339713057882
+    }
+
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+    parameters {
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
     }
     stages {
         stage('Read the version') {
@@ -54,6 +54,14 @@ pipeline {
                 }
                  
                }
+            }
+        }
+        stage('Trigger Deploy'){
+            when { 
+                expression { params.deploy }
+            }
+            steps{
+                build job: 'backend-cd', parameters: [string(name: 'version', value: "${appVersion}")], wait: true
             }
         }
     }
