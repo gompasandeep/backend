@@ -33,13 +33,13 @@ pipeline {
             }
         }
 
-        // stage('Docker Build') {
-        //     steps {
-        //         sh """
-        //         docker build -t sandeepgompa/backend:${appVersion} .
-        //         """
-        //     }
-        // }
+        stage('Docker Build') {
+            steps {
+                sh """
+                docker build -t sandeepgompa/backend:${appVersion} .
+                """
+            }
+        }
         // stage('Docker Build'){
         //     steps {
         //        script{
